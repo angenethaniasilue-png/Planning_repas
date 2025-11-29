@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning Repas Mensuel - Budget 200€</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fff5f0 0%, #ffe5e5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+            color: #ff6b35;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #333;
+        }
+
+        .budget-display {
+            text-align: right;
+        }
+
+        .budget-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .budget-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-budget {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .btn-budget:hover {
+            background: #a7f3d0;
+        }
+
+        .btn-shopping {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .btn-shopping:hover {
+            background: #bfdbfe;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .budget-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .budget-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background: #d1fae5;
+            border-radius: 10px;
+            border: 2px solid #10b981;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .shopping-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .shopping-category {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .category-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .shopping-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .bullet {
+            width: 8px;
+            height: 8px;
+            background: #ff6b35;
+            border-radius: 50%;
+        }
+
+        .week-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .week-btn {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .week-btn:hover {
+            border-color: #ff6b35;
+        }
+
+        .week-btn.active {
+            border-color: #ff6b35;
+            background: #fff5f0;
+            box-shadow: 0 4px 15px rgba(255,107,53,0.2);
+        }
+
+        .week-btn-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .week-btn-type {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .week-btn-count {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .meals-container {
+            border: 2px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 25px;
+        }
+
+        .meals-container.school {
+            background: #eff6ff;
+            border-color: #93c5fd;
+        }
+
+        .meals-container.home {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .meals-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .meals-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .meals-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .meal-card {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+
+        .meal-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .meal-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 15px;
+        }
+
+        .meal-info {
+            flex: 1;
+        }
+
+        .meal-day {
+            font-size: 13px;
+            color: #ff6b35;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .meal-name {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .meal-protein {
+            background: #fff5f0;
+            color: #ff6b35;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 30px;
+        }
+
+        .footer p {
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 22px;
+            }
+            
+            .budget-amount {
+                font-size: 24px;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .budget-display {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div class="header-title">
+                    <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    <h1>Planning Repas Mensuel</h1>
+                </div>
+                <div class="budget-display">
+                    <div class="budget-label">Budget mensuel</div>
+                    <div class="budget-amount">200 €</div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-budget" onclick="toggleBudget()">
+                    💰 Détail Budget
+                </button>
+                <button class="btn btn-shopping" onclick="toggleShopping()">
+                    🛒 Liste Courses
+                </button>
+            </div>
+        </div>
+
+        <!-- Budget Card -->
+        <div class="card" id="budgetCard">
+            <h2 class="card-title">
+                💰 Répartition du Budget
+            </h2>
+            <div class="budget-item">
+                <span>Repas école (10 repas)</span>
+                <span style="font-weight: 600; color: #10b981;">10 €</span>
+            </div>
+            <div class="budget-item">
+                <span>Viandes + œufs (42 repas)</span>
+                <span style="font-weight: 600; color: #10b981;">75-85 €</span>
+            </div>
+            <div class="budget-item">
+                <span>Féculents + légumes</span>
+                <span style="font-weight: 600; color: #10b981;">30-40 €</span>
+            </div>
+            <div class="budget-item">
+                <span>Fruits (optionnels)</span>
+                <span style="font-weight: 600; color: #10b981;">8-10 €</span>
+            </div>
+            <div class="budget-item">
+                <span>Produits de base (huile, épices, etc.)</span>
+                <span style="font-weight: 600; color: #10b981;">20-25 €</span>
+            </div>
+            <div class="budget-item">
+                <span>2 sorties fast-food/resto</span>
+                <span style="font-weight: 600; color: #10b981;">20-24 €</span>
+            </div>
+            <div class="budget-item">
+                <span>Snacks/boissons</span>
+                <span style="font-weight: 600; color: #10b981;">10-12 €</span>
+            </div>
+            <div class="budget-total">
+                <span>TOTAL ESTIMÉ</span>
+                <span style="font-size: 20px; color: #10b981;">173-196 €</span>
+            </div>
+        </div>
+
+        <!-- Shopping Card -->
+        <div class="card" id="shoppingCard">
+            <h2 class="card-title">
+                🛒 Liste de Courses Mensuelle
+            </h2>
+            <div class="shopping-grid">
+                <div class="shopping-category">
+                    <div class="category-title">Viandes/Protéines</div>
+                    <div class="shopping-item"><span class="bullet"></span>Poulet (2-3 kg)</div>
+                    <div class="shopping-item"><span class="bullet"></span>Échine de porc (1 kg)</div>
+                    <div class="shopping-item"><span class="bullet"></span>Bœuf haché (500g)</div>
+                    <div class="shopping-item"><span class="bullet"></span>Lardons (300g)</div>
+                    <div class="shopping-item"><span class="bullet"></span>Thon en boîte (4-5 boîtes)</div>
+                    <div class="shopping-item"><span class="bullet"></span>Œufs (18 unités)</div>
+                </div>
+                <div class="shopping-category">
+                    <div class="category-title">Féculents</div>
+                    <div class="shopping-item"><span class="bullet"></span>Pâtes (2 kg)</div>
+                    <div class="shopping-item"><span class="bullet"></span>Riz (2 kg)</div>
+                    <div class="shopping-item"><span class="bullet"></span>Pommes de terre (3 kg)</div>
+                    <div class="shopping-item"><span class="bullet"></span>Pain</div>
+                </div>
+                <div class="shopping-category">
+                    <div class="category-title">Légumes</div>
+                    <div class="shopping-item"><span class="bullet"></span>Brocolis</div>
+                    <div class="shopping-item"><span class="bullet"></span>Haricots verts</div>
+                    <div class="shopping-item"><span class="bullet"></span>Petits pois</div>
+                    <div class="shopping-item"><span class="bullet"></span>Tomates</div>
+                    <div class="shopping-item"><span class="bullet"></span>Oignons</div>
+                </div>
+                <div class="shopping-category">
+                    <div class="category-title">Produits de base</div>
+                    <div class="shopping-item"><span class="bullet"></span>Huile d'olive</div>
+                    <div class="shopping-item"><span class="bullet"></span>Crème fraîche</div>
+                    <div class="shopping-item"><span class="bullet"></span>Sauce tomate</div>
+                    <div class="shopping-item"><span class="bullet"></span>Épices</div>
+                    <div class="shopping-item"><span class="bullet"></span>Sel/poivre</div>
+                    <div class="shopping-item"><span class="bullet"></span>Lait</div>
+                </div>
+                <div class="shopping-category">
+                    <div class="category-title">Fruits (optionnel)</div>
+                    <div class="shopping-item"><span class="bullet"></span>Pommes</div>
+                    <div class="shopping-item"><span class="bullet"></span>Bananes</div>
+                    <div class="shopping-item"><span class="bullet"></span>Oranges</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week Selector -->
+        <div class="header">
+            <h2 class="card-title">📅 Sélectionner la semaine</h2>
+            <div class="week-selector">
+                <div class="week-btn active" onclick="selectWeek(1)">
+                    <div class="week-btn-title">🏫 Semaine 1</div>
+                    <div class="week-btn-type">École midi</div>
+                    <div class="week-btn-count">7 repas</div>
+                </div>
+                <div class="week-btn" onclick="selectWeek(2)">
+                    <div class="week-btn-title">🏠 Semaine 2</div>
+                    <div class="week-btn-type">Full maison</div>
+                    <div class="week-btn-count">14 repas</div>
+                </div>
+                <div class="week-btn" onclick="selectWeek(3)">
+                    <div class="week-btn-title">🏫 Semaine 3</div>
+                    <div class="week-btn-type">École midi</div>
+                    <div class="week-btn-count">7 repas</div>
+                </div>
+                <div class="week-btn" onclick="selectWeek(4)">
+                    <div class="week-btn-title">🏠 Semaine 4</div>
+                    <div class="week-btn-type">Full maison</div>
+                    <div class="week-btn-count">14 repas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meals Display -->
+        <div id="mealsDisplay"></div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>💡 Total mensuel : 42 repas maison • Budget optimisé : ~173-196 € / mois</p>
+            <p>🔄 Alternance automatique : École → Maison → École → Maison</p>
+        </div>
+    </div>
+
+    <script>
+        const weeks = {
+            1: {
+                type: "École midi",
+                class: "school",
+                meals: [
+                    { day: "Lundi soir", meal: "Pâtes bolognese", protein: "Bœuf haché" },
+                    { day: "Mardi soir", meal: "Riz + poulet sauté + brocolis", protein: "Poulet" },
+                    { day: "Mercredi soir", meal: "Pâtes crème-lardons", protein: "Lardons" },
+                    { day: "Jeudi soir", meal: "Échine de porc + haricots verts", protein: "Échine" },
+                    { day: "Vendredi soir", meal: "Purée + poulet rôti", protein: "Poulet" },
+                    { day: "Samedi", meal: "Riz + thon + sauce tomate", protein: "Thon" },
+                    { day: "Dimanche", meal: "Œufs + pommes de terre sautées", protein: "Œufs" }
+                ]
+            },
+            2: {
+                type: "Full maison",
+                class: "home",
+                meals: [
+                    { day: "Lundi midi", meal: "Ragoût pommes de terre + petits pois + poulet", protein: "Poulet" },
+                    { day: "Lundi soir", meal: "Restes du ragoût", protein: "Poulet" },
+                    { day: "Mardi midi", meal: "Pâtes bolognese", protein: "Bœuf haché" },
+                    { day: "Mardi soir", meal: "Poulet + riz + brocolis", protein: "Poulet" },
+                    { day: "Mercredi midi", meal: "Pâtes crème-lardons", protein: "Lardons" },
+                    { day: "Mercredi soir", meal: "Échine + haricots verts", protein: "Échine" },
+                    { day: "Jeudi midi", meal: "Riz + œufs + légumes", protein: "Œufs" },
+                    { day: "Jeudi soir", meal: "Poulet sauté + pâtes", protein: "Poulet" },
+                    { day: "Vendredi midi", meal: "Thon + riz", protein: "Thon" },
+                    { day: "Vendredi soir", meal: "Purée + poulet", protein: "Poulet" },
+                    { day: "Samedi midi", meal: "Ragoût (nouvelle version)", protein: "Poulet" },
+                    { day: "Samedi soir", meal: "Pâtes bolognese", protein: "Bœuf haché" },
+                    { day: "Dimanche midi", meal: "Échine + riz", protein: "Échine" },
+                    { day: "Dimanche soir", meal: "Œufs + légumes", protein: "Œufs" }
+                ]
+            },
+            3: {
+                type: "École midi",
+                class: "school",
+                meals: [
+                    { day: "Lundi soir", meal: "Haricots verts + échine + riz", protein: "Échine" },
+                    { day: "Mardi soir", meal: "Purée + poulet grillé", protein: "Poulet" },
+                    { day: "Mercredi soir", meal: "Pâtes bolognese", protein: "Bœuf haché" },
+                    { day: "Jeudi soir", meal: "Riz + œufs", protein: "Œufs" },
+                    { day: "Vendredi soir", meal: "Pâtes crème-lardons", protein: "Lardons" },
+                    { day: "Samedi", meal: "Ragoût pommes de terre + petits pois", protein: "Poulet" },
+                    { day: "Dimanche", meal: "Riz + poulet + brocolis", protein: "Poulet" }
+                ]
+            },
+            4: {
+                type: "Full maison",
+                class: "home",
+                meals: [
+                    { day: "Lundi midi", meal: "Thon + pâtes", protein: "Thon" },
+                    { day: "Lundi soir", meal: "Poulet + pommes de terre", protein: "Poulet" },
+                    { day: "Mardi midi", meal: "Bolognese", protein: "Bœuf haché" },
+                    { day: "Mardi soir", meal: "Riz + brocolis + échine", protein: "Échine" },
+                    { day: "Mercredi midi", meal: "Pâtes crème-lardons", protein: "Lardons" },
+                    { day: "Mercredi soir", meal: "Ragoût", protein: "Poulet" },
+                    { day: "Jeudi midi", meal: "Œufs + légumes", protein: "Œufs" },
+                    { day: "Jeudi soir", meal: "Poulet + riz", protein: "Poulet" },
+                    { day: "Vendredi midi", meal: "Pâtes bolognese", protein: "Bœuf haché" },
+                    { day: "Vendredi soir", meal: "Échine + haricots verts", protein: "Échine" },
+                    { day: "Samedi midi", meal: "Riz + thon", protein: "Thon" },
+                    { day: "Samedi soir", meal: "Purée + poulet", protein: "Poulet" },
+                    { day: "Dimanche midi", meal: "Ragoût", protein: "Poulet" },
+                    { day: "Dimanche soir", meal: "Pâtes + œufs", protein: "Œufs" }
+                ]
+            }
+        };
+
+        let currentWeek = 1;
+
+        function toggleBudget() {
+            const card = document.getElementById('budgetCard');
+            card.classList.toggle('active');
+        }
+
+        function toggleShopping() {
+            const card = document.getElementById('shoppingCard');
+            card.classList.toggle('active');
+        }
+
+        function selectWeek(weekNum) {
+            currentWeek = weekNum;
+            
+            // Update buttons
+            const buttons = document.querySelectorAll('.week-btn');
+            buttons.forEach((btn, idx) => {
+                btn.classList.toggle('active', idx + 1 === weekNum);
+            });
+            
+            // Display meals
+            displayMeals();
+        }
+
+        function displayMeals() {
+            const week = weeks[currentWeek];
+            const container = document.getElementById('mealsDisplay');
+            
+            let html = `
+                <div class="meals-container ${week.class}">
+                    <div class="meals-header">
+                        <div>
+                            <div class="meals-title">Semaine ${currentWeek}</div>
+                            <div class="meals-subtitle">${week.type} • ${week.meals.length} repas maison</div>
+                        </div>
+                    </div>
+                    <div>
+            `;
+            
+            week.meals.forEach(meal => {
+                html += `
+                    <div class="meal-card">
+                        <div class="meal-content">
+                            <div class="meal-info">
+                                <div class="meal-day">${meal.day}</div>
+                                <div class="meal-name">${meal.meal}</div>
+                            </div>
+                            <div class="meal-protein">${meal.protein}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        // Initialize on load
+        displayMeals();
+    </script>
+</body>
+</html>
